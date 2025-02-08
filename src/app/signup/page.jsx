@@ -18,47 +18,130 @@ const Signup = () => {
     password: "",
   });
 
+  const [errors, setErrors] = useState({
+    name: "",
+    contact: "",
+    email: "",
+    cnic: "",
+    institution: "",
+    password: "",
+  });
+
   const [loading, setLoading] = useState(false);
+
+  // Validation patterns
+  const patterns = {
+    name: /^[a-zA-Z\s]{3,50}$/,
+    contact: /^(\+92|0)?[0-9]{10}$/,
+    email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+    cnic: /^\d{5}-\d{7}-\d{1}$/,
+    password: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$/,
+  };
+
+  // Error messages
+  const errorMessages = {
+    name: "Name should only contain letters and be 3-50 characters long",
+    contact: "Please enter a valid Pakistani phone number",
+    email: "Please enter a valid email address",
+    cnic: "Please enter a valid CNIC number (format: 12345-1234567-1)",
+    institution: "Institution name is required",
+    password: "Password must be at least 6 characters with letters and numbers",
+  };
+
+  // Format input based on field type
+  const formatInput = (id, value) => {
+    switch (id) {
+      case 'contact':
+        // Remove all non-digits
+        value = value.replace(/\D/g, '');
+        // Add +92 if it starts with 0
+        if (value.startsWith('0')) {
+          value = '+92' + value.slice(1);
+        }
+        return value;
+
+      case 'cnic':
+        // Remove all non-digits
+        value = value.replace(/\D/g, '');
+        // Add hyphens for CNIC format
+        if (value.length > 5) {
+          value = value.slice(0, 5) + '-' + value.slice(5);
+        }
+        if (value.length > 13) {
+          value = value.slice(0, 13) + '-' + value.slice(13);
+        }
+        return value.slice(0, 15);
+
+      case 'name':
+        // Remove any numbers or special characters
+        return value.replace(/[^a-zA-Z\s]/g, '');
+
+      default:
+        return value;
+    }
+  };
+
+  // Validate individual field
+  const validateField = (id, value) => {
+    switch (id) {
+      case 'name':
+      case 'contact':
+      case 'email':
+      case 'cnic':
+      case 'password':
+        if (!value) {
+          return `${id.charAt(0).toUpperCase() + id.slice(1)} is required`;
+        }
+        if (!patterns[id].test(value)) {
+          return errorMessages[id];
+        }
+        return "";
+
+      case 'institution':
+        if (!value || value.trim().length < 2) {
+          return errorMessages.institution;
+        }
+        return "";
+
+      default:
+        return "";
+    }
+  };
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData({
-      ...formData,
-      [id]: value,
-    });
+    const formattedValue = formatInput(id, value);
+    
+    setFormData(prev => ({
+      ...prev,
+      [id]: formattedValue,
+    }));
+
+    // Validate and set error
+    const error = validateField(id, formattedValue);
+    setErrors(prev => ({
+      ...prev,
+      [id]: error,
+    }));
   };
 
   const validateForm = () => {
-    if (!formData.email || !formData.password || !formData.name || 
-        !formData.contact || !formData.cnic || !formData.institution) {
-      toast.error("Please fill in all fields.");
-      return false;
-    }
+    let isValid = true;
+    const newErrors = {};
 
-    // Email validation
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    if (!emailPattern.test(formData.email)) {
-      toast.error("Please enter a valid email.");
-      return false;
-    }
+    // Validate all fields
+    Object.keys(formData).forEach(key => {
+      const error = validateField(key, formData[key]);
+      newErrors[key] = error;
+      if (error) {
+        isValid = false;
+      }
+    });
 
-    // CNIC validation (assuming Pakistani CNIC format: 12345-1234567-1)
-    const cnicPattern = /^\d{5}-\d{7}-\d{1}$/;
-    if (!cnicPattern.test(formData.cnic)) {
-      toast.error("Please enter a valid CNIC (format: 12345-1234567-1)");
-      return false;
-    }
-
-    // Contact validation (assuming Pakistani format)
-    const contactPattern = /^(\+92|0)?[0-9]{10}$/;
-    if (!contactPattern.test(formData.contact)) {
-      toast.error("Please enter a valid contact number");
-      return false;
-    }
-
-    // Password validation
-    if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters.");
+    setErrors(newErrors);
+    
+    if (!isValid) {
+      toast.error("Please fix all errors before submitting.");
       return false;
     }
 
@@ -100,32 +183,32 @@ const Signup = () => {
     }
   };
 
-  const InputField = ({ label, id, type = "text", placeholder, delay }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
-      className="mb-4"
-    >
+  const renderInput = (id, label, type = "text", placeholder) => (
+    <div>
       <label className="font-semibold text-sm text-gray-300 pb-1 block">
         {label}
+        {errors[id] && (
+          <span className="text-red-500 text-xs ml-2">
+            {errors[id]}
+          </span>
+        )}
       </label>
       <input
-        className="border bg-[#2a2a2a] border-gray-700 rounded-lg px-3 py-2 mt-1 text-sm w-full 
-                  focus:border-red-500 focus:ring-2 focus:ring-red-500 text-white transition-all duration-200"
+        className={`border bg-[#2a2a2a] border-gray-700 rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full 
+                  focus:border-red-500 focus:ring-2 focus:ring-red-500 text-white transition-all duration-200
+                  ${errors[id] ? 'border-red-500' : ''}`}
         type={type}
         id={id}
-        placeholder={placeholder}
         value={formData[id]}
         onChange={handleChange}
         required
+        placeholder={placeholder}
       />
-    </motion.div>
+    </div>
   );
 
   return (
     <div className="min-h-screen flex m-0 p-0 h-screen relative bg-[#1a1a1a]">
-      {/* Left side: Image with overlay */}
       <div className="w-full lg:w-1/2 hidden lg:block relative">
         <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a1a] to-transparent z-10" />
         <Image
@@ -137,7 +220,6 @@ const Signup = () => {
         />
       </div>
 
-      {/* Right side: Signup Form */}
       <motion.div 
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -185,17 +267,32 @@ const Signup = () => {
           </motion.h2>
 
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-            <InputField label="Name" id="name" placeholder="Enter your full name" delay={0.4} />
-            <InputField label="Contact" id="contact" placeholder="+92XXXXXXXXXX" delay={0.4} />
-            <InputField label="Email" id="email" type="email" placeholder="your@email.com" delay={0.5} />
-            <InputField label="CNIC" id="cnic" placeholder="XXXXX-XXXXXXX-X" delay={0.5} />
-            <InputField label="Institution" id="institution" placeholder="Your institution name" delay={0.6} />
-            <InputField label="Password" id="password" type="password" placeholder="••••••••" delay={0.6} />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="space-y-4 col-span-1"
+            >
+              {renderInput("name", "Name", "text", "Enter your full name")}
+              {renderInput("contact", "Contact", "text", "+92XXXXXXXXXX")}
+              {renderInput("email", "Email", "email", "your@email.com")}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="space-y-4 col-span-1"
+            >
+              {renderInput("cnic", "CNIC", "text", "XXXXX-XXXXXXX-X")}
+              {renderInput("institution", "Institution", "text", "Your institution name")}
+              {renderInput("password", "Password", "password", "••••••••")}
+            </motion.div>
 
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
+              transition={{ delay: 0.6 }}
               className="mt-5 md:col-span-2"
             >
               <button
@@ -203,7 +300,7 @@ const Signup = () => {
                           hover:from-red-600 hover:to-red-500 transition-all duration-200 transform hover:scale-[1.02]
                           disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                 type="submit"
-                disabled={loading}
+                disabled={loading || Object.values(errors).some(error => error)}
               >
                 {loading ? "Signing up..." : "Sign Up"}
               </button>
@@ -213,7 +310,7 @@ const Signup = () => {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
+            transition={{ delay: 0.7 }}
             className="mt-4 text-center"
           >
             <p className="text-sm text-gray-400">
