@@ -106,12 +106,12 @@ const page = () => {
   );
 
   return (
-    <div className="bg-[#1a1a1a] min-h-screen px-[300px] py-10">
+    <div className="bg-[#1a1a1a] min-h-screen py-10">
       <h1 className="text-gray-300 font-bold text-center text-xl">
         Your Profile
       </h1>
 
-      <form onSubmit={handleSubmit} className="pt-4">
+      <form onSubmit={handleSubmit} className="pt-4 max-w-[700px] m-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
