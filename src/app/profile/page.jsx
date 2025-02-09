@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -16,17 +16,22 @@ const page = () => {
     cnic: "",
     institution: "",
     password: "",
+    "img-upload": "/default-profile-pic.jpg",
   });
 
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [id]: value,
-    });
+    }));
   };
+
+  useEffect(() => {
+    // todo: fetch data and store in formData
+  }, [])
 
   const validateForm = () => {
     if (
@@ -78,6 +83,8 @@ const page = () => {
     const isValid = validateForm();
     if (!isValid) {
       setLoading(false);
+
+      // todo: send api request to save profile data
       return;
     }
   };
@@ -100,6 +107,7 @@ const page = () => {
         placeholder={placeholder}
         value={formData[id]}
         onChange={handleChange}
+        // todo: fix rerendering of fields on input change
         required
       />
     </motion.div>
@@ -108,7 +116,7 @@ const page = () => {
   return (
     <div className="bg-[#1a1a1a] min-h-screen py-10">
       <h1 className="text-gray-300 font-bold text-center text-xl">
-        Your Profile
+        Your Brand Ambassador Profile
       </h1>
 
       <form onSubmit={handleSubmit} className="pt-4 max-w-[700px] m-auto px-4">
@@ -118,7 +126,7 @@ const page = () => {
           delay={0.3}
           className="flex items-center justify-center gap-4 py-4 w-full"
         >
-          <div className="w-[150px] h-[150px] rounded-full bg-red-600"></div>
+          <img className="w-[150px] h-[150px] rounded-full" src={formData['img-upload']}/>
           <div className="flex flex-col gap-2 justify-start">
             <label
               style={{ cursor: "pointer" }}
@@ -132,11 +140,21 @@ const page = () => {
               style={{
                 display: "none",
               }}
-              accept="image/*"
+              accept="image/jpeg, image/png, image/webp"
               type="file"
               className=""
+              onChange={e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                  setFormData({...formData, 'img-upload': reader.result});
+                };
+                reader.readAsDataURL(file);
+
+              }}
             />
-            <button className="text-gray-300 w-max underline text-sm">
+            <button className="text-gray-300 w-max underline text-sm" onClick={() => setFormData({...formData, 'img-upload': '/default-profile-pic.jpg'})}>
               Remove Image
             </button>
           </div>
@@ -192,8 +210,9 @@ const page = () => {
               className="py-2 px-20 bg-[#2a2a2a] text-gray-300 rounded-lg w-full 
                   hover:from-red-600 hover:to-red-500 transition-all duration-200 transform hover:scale-[1.02]
                   disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-              type="submit"
+              type="button"
               disabled={loading}
+              onClick={() => router.back()}
             >
               Discard Changes
             </button>
