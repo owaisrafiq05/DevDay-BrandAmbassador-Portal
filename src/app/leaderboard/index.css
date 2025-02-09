@@ -19,8 +19,11 @@
   }
   .rank-div {
     width: 110px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
-  table {
-    /* margin-top: 0 !important; */
+  th {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
   }
 }
