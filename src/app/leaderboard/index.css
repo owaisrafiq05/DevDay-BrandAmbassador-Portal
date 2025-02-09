@@ -1,0 +1,26 @@
+@media screen and (max-width: 640px) {
+  table {
+    font-size: 14px !important;
+    border-radius: 10px !important;
+  }
+  .first-three {
+    gap: 5px;
+  }
+}
+
+@media screen and (max-width: 680px) {
+  .first-three img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+  .first-three h1 {
+    font-size: 0.8rem;
+  }
+  .rank-div {
+    width: 110px;
+  }
+  table {
+    /* margin-top: 0 !important; */
+  }
+}
