@@ -306,7 +306,7 @@ const Signup = () => {
               {loading ? "Signing up..." : "Sign Up"}
             </button>
 
-            <p className="text-center text-gray-400 text-sm">
+            {/* <p className="text-center text-gray-400 text-sm">
               Already have an account?{" "}
               <Link 
                 href="/login" 
@@ -314,7 +314,7 @@ const Signup = () => {
               >
                 Login
               </Link>
-            </p>
+            </p> */}
           </form>
         </motion.div>
       </div>
