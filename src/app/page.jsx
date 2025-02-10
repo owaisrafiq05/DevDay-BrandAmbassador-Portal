@@ -3,7 +3,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { FaQrcode, FaLink, FaTwitter, FaFacebook, FaWhatsapp, FaLinkedin, FaCopy } from "react-icons/fa6";
 import QRCode from "react-qr-code";
-import { toast } from "sonner";
+import { Toaster, toast } from 'sonner';
 
 const Dashboard = () => {
   const [showQR, setShowQR] = useState(false);
@@ -50,6 +50,7 @@ const Dashboard = () => {
 
   return (
     <div className="bg-[#1a1a1a] min-h-screen py-7 pl-0 lg:pl-64">
+      <Toaster/>
       <div className="max-w-7xl mx-auto px-4 mt-12">
         {/* Welcome Section */}
         <motion.div 

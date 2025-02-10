@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaImage } from "react-icons/fa6";
@@ -26,10 +26,21 @@ const Signup = () => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData({
-      ...formData,
-      [id]: value,
-    });
+
+    // Automatically format CNIC
+    if (id === "cnic") {
+      const formattedCnic = formatCnic(value);
+      setFormData({ ...formData, cnic: formattedCnic });
+    } else {
+      setFormData({ ...formData, [id]: value });
+    }
+  };
+
+  const formatCnic = (value) => {
+    // Remove all non-digit characters
+    const digits = value.replace(/\D/g, "");
+    // Format as XXXXX-XXXXXXX-X
+    return digits.replace(/(\d{5})(\d{7})(\d{1})?/, "$1-$2-$3").trim();
   };
 
   const handleImageUpload = (e) => {
@@ -65,10 +76,10 @@ const Signup = () => {
       return false;
     }
 
-    // Contact validation (Pakistan number format)
-    const contactRegex = /^03\d{9}$/;
+    // Contact validation (11-digit number)
+    const contactRegex = /^\d{11}$/;
     if (!contactRegex.test(formData.contact)) {
-      toast.error("Please enter a valid Pakistani mobile number (03XXXXXXXXX)");
+      toast.error("Please enter a valid 11-digit mobile number");
       return false;
     }
 
@@ -118,7 +129,7 @@ const Signup = () => {
       submitData.append('ProfilePhoto', formData.profileImage);
 
       const response = await axios.post(
-        'https://dev-day-backend.vercel.app/BrandAmbassador/signup',
+        'http://localhost:4000/BrandAmbassador/signup',
         submitData,
         {
           headers: {
@@ -150,15 +161,16 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex">
+      <Toaster/>
       {/* Left side - Branding */}
       <div className="w-full lg:w-1/2 hidden lg:block relative">
-        <div className="absolute inset-0 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a1a] to-transparent z-10" />
         <Image
-          src={"/devday-bg.jpg"}
+          src={"/devday-bg.png"}
           alt="Background Image"
           layout="fill"
           objectFit="cover"
-          className="opacity-100"
+          className="opacity-60"
         />
       </div>
 
@@ -170,7 +182,7 @@ const Signup = () => {
           transition={{ duration: 0.5 }}
           className="w-full max-w-[500px] p-8 bg-[#242424] rounded-lg shadow-2xl"
         >
-          <h2 className="text-2xl font-bold text-white mb-6">BA Registration Form</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">Sign Up</h2>
           
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Profile Image Upload */}
@@ -306,7 +318,7 @@ const Signup = () => {
               {loading ? "Signing up..." : "Sign Up"}
             </button>
 
-            {/* <p className="text-center text-gray-400 text-sm">
+            <p className="text-center text-gray-400 text-sm">
               Already have an account?{" "}
               <Link 
                 href="/login" 
@@ -314,7 +326,7 @@ const Signup = () => {
               >
                 Login
               </Link>
-            </p> */}
+            </p>
           </form>
         </motion.div>
       </div>
