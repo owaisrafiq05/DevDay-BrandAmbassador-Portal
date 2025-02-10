@@ -1,14 +1,33 @@
-import { useState } from "react";
-import { FiHome, FiSettings, FiLogOut, FiX , FiMenu } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { FiHome, FiSettings, FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { FaTrophy } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false); // Default to closed
+  const [isMobile, setIsMobile] = useState(false);
   const [activeLink, setActiveLink] = useState("home");
   const router = useRouter();
+
+  // Check for mobile view on mount and window resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+      // Set sidebar state based on screen size
+      setIsOpen(window.innerWidth >= 1024);
+    };
+
+    // Initial check
+    checkMobile();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', checkMobile);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const menuItems = [
     {
@@ -35,10 +54,12 @@ const Sidebar = () => {
 
   const handleLinkClick = (id) => {
     setActiveLink(id);
+    if (isMobile) {
+      setIsOpen(false); // Close sidebar on mobile after clicking a link
+    }
   };
 
   const handleLogout = () => {
-    // Add any logout logic here (clearing tokens, etc.)
     router.push('/login');
   };
 
@@ -57,8 +78,7 @@ const Sidebar = () => {
           ${isOpen ? "w-64" : "w-0 lg:w-20"} overflow-hidden`}
         aria-label="Sidebar navigation"
       >
-        <div className="h-full flex flex-col px-4 py-6 pt-16 md:pt-8">
-          <Link href={"/"}>
+        <div className="h-full flex flex-col px-4 py-6 pt-16 md:pt-4">
           <div className={`mb-8 flex justify-center ${!isOpen && "lg:hidden"}`}>
             <Image
               src="/logo2.png"
@@ -69,7 +89,6 @@ const Sidebar = () => {
               className="mx-auto"
             />
           </div>
-          </Link>
 
           <nav className="flex-grow">
             <ul className="space-y-1">
