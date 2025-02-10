@@ -1,7 +1,6 @@
 // layout.js
 import ClientWrapper from "./ClientWrapper";
 import { Geist, Geist_Mono } from "next/font/google";
-import { redirect } from 'next/navigation';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,15 +29,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-
-export const middleware = (request) => {
-  const { pathname } = request.nextUrl;
-  
-  if (pathname !== '/signup') {
-    return redirect('/signup');
-  }
-};
-
-export const config = {
-  matcher: '/:path*'
-};

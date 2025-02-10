@@ -1,13 +1,7 @@
 {
     "redirects": [
       {
-        "source": "/",
-        "has": [
-          {
-            "type": "host",
-            "value": "devday25.com"
-          }
-        ],
+        "source": "(.*)",
         "destination": "https://ba.devday25.com/signup",
         "permanent": true
       }
