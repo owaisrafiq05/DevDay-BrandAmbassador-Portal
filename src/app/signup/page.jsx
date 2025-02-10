@@ -129,7 +129,7 @@ const Signup = () => {
       submitData.append('ProfilePhoto', formData.profileImage);
 
       const response = await axios.post(
-        'http://localhost:4000/BrandAmbassador/signup',
+        'https://dev-day-backend.vercel.app/BrandAmbassador/signup',
         submitData,
         {
           headers: {
@@ -164,13 +164,13 @@ const Signup = () => {
       <Toaster/>
       {/* Left side - Branding */}
       <div className="w-full lg:w-1/2 hidden lg:block relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a1a] to-transparent z-10" />
+        <div className="absolute inset-0 z-10" />
         <Image
-          src={"/devday-bg.png"}
+          src={"/devday-bg.jpg"}
           alt="Background Image"
           layout="fill"
           objectFit="cover"
-          className="opacity-60"
+          className="opacity-100"
         />
       </div>
 
