@@ -6,7 +6,7 @@ import Sidebar from "./globalComp/sidebar";
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
-  const excludedRoutes = ['/login', '/signup'];
+  const excludedRoutes = ['/login', '/signup', '/verify'];
   const showSidebar = !excludedRoutes.includes(pathname);
 
   return (

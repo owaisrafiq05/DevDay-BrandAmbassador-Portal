@@ -5,15 +5,21 @@ import Image from "next/image";
 import { toast } from "sonner";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { FaImage } from "react-icons/fa6";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const Signup = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     contact: "",
     email: "",
     cnic: "",
     institution: "",
-    password: "",
+    socialHandle: "",
+    profileImage: null,
+    imagePreview: null,
   });
 
   const [loading, setLoading] = useState(false);
@@ -26,46 +32,120 @@ const Signup = () => {
     });
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error("Image size should be less than 5MB");
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        toast.error("Please upload an image file");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({
+          ...formData,
+          profileImage: file,
+          imagePreview: reader.result,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const validateForm = () => {
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+
+    // Contact validation (Pakistan number format)
+    const contactRegex = /^03\d{9}$/;
+    if (!contactRegex.test(formData.contact)) {
+      toast.error("Please enter a valid Pakistani mobile number (03XXXXXXXXX)");
+      return false;
+    }
+
+    // CNIC validation
+    const cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
+    if (!cnicRegex.test(formData.cnic)) {
+      toast.error("Please enter a valid CNIC number (XXXXX-XXXXXXX-X)");
+      return false;
+    }
+
+    // Required fields validation
+    const requiredFields = ['name', 'contact', 'email', 'cnic', 'institution', 'socialHandle'];
+    const emptyFields = requiredFields.filter(field => !formData[field]);
+    
+    if (emptyFields.length > 0) {
+      toast.error(`Please fill in all required fields: ${emptyFields.join(', ')}`);
+      return false;
+    }
+
+    // Profile image validation
+    if (!formData.profileImage) {
+      toast.error("Please upload a profile image");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const isValid = validateForm();
-    if (!isValid) {
+    if (!validateForm()) {
       setLoading(false);
       return;
     }
 
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      // Create FormData object for multipart/form-data
+      const submitData = new FormData();
+      submitData.append('Name', formData.name);
+      submitData.append('Contact', formData.contact);
+      submitData.append('Email', formData.email);
+      submitData.append('CNIC', formData.cnic);
+      submitData.append('Institution', formData.institution);
+      submitData.append('Instagram_Handle', formData.socialHandle);
+      submitData.append('ProfilePhoto', formData.profileImage);
 
-      const data = await response.json();
+      const response = await axios.post(
+        'http://localhost:4000/BrandAmbassador/signup',
+        submitData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
 
-      if (response.ok) {
-        toast.success('Signup successful!');
-      } else {
-        toast.error(data.message || 'Signup failed');
+      if (response.data.success) {
+        toast.success(response.data.message);
+        localStorage.setItem('ambassadorData', JSON.stringify(response.data.ambassador));
+        setTimeout(() => {
+          router.push('/verify');
+        }, 2000);
       }
     } catch (error) {
       console.error('Signup error:', error);
-      toast.error('An error occurred during signup');
+      if (error.response) {
+        toast.error(error.response.data.message || 'Signup failed');
+      } else if (error.request) {
+        toast.error('No response from server. Please try again later.');
+      } else {
+        toast.error('An error occurred during signup');
+      }
     } finally {
       setLoading(false);
     }
-  };
-
-  const validateForm = () => {
-    if (!Object.values(formData).every(field => field)) {
-      toast.error("Please fill in all fields.");
-      return false;
-    }
-    return true;
   };
 
   return (
@@ -90,9 +170,40 @@ const Signup = () => {
           transition={{ duration: 0.5 }}
           className="w-full max-w-[500px] p-8 bg-[#242424] rounded-lg shadow-2xl"
         >
-          <h2 className="text-2xl font-bold text-white mb-6">Sign Up</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">BA Registration Form</h2>
           
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Profile Image Upload */}
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-[#2a2a2a] border-2 border-red-500/20 flex items-center justify-center">
+                  {formData.imagePreview ? (
+                    <Image
+                      src={formData.imagePreview}
+                      alt="Profile Preview"
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  ) : (
+                    <FaImage className="w-12 h-12 text-gray-500" />
+                  )}
+                </div>
+                <label 
+                  htmlFor="profileImage"
+                  className="absolute bottom-0 right-0 bg-red-600 p-2 rounded-full cursor-pointer hover:bg-red-700 transition-colors"
+                >
+                  <FaImage className="w-4 h-4 text-white" />
+                </label>
+                <input
+                  type="file"
+                  id="profileImage"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="text-sm text-gray-300 mb-1.5 block">
@@ -171,13 +282,14 @@ const Signup = () => {
 
               <div>
                 <label className="text-sm text-gray-300 mb-1.5 block">
-                  Password
+                  Social Media Handle
                 </label>
                 <input
-                  type="password"
-                  id="password"
-                  value={formData.password}
+                  type="text"
+                  id="socialHandle"
+                  value={formData.socialHandle}
                   onChange={handleChange}
+                  placeholder="@username"
                   className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white 
                            focus:outline-none focus:border-red-500 transition-colors"
                   required
