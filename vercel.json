@@ -1,9 +1,15 @@
 {
     "redirects": [
-        {
-            "source": "/(.*)",
-            "destination": "https://ba.devday25.com/signup",
-            "permanent": true
-        }
+      {
+        "source": "/",
+        "has": [
+          {
+            "type": "host",
+            "value": "devday25.com"
+          }
+        ],
+        "destination": "https://ba.devday25.com/signup",
+        "permanent": true
+      }
     ]
-}
+  }
