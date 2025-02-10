@@ -1,0 +1,9 @@
+{
+    "redirects": [
+        {
+            "source": "/(.*)",
+            "destination": "https://ba.devday25.com/signup",
+            "permanent": true
+        }
+    ]
+}
