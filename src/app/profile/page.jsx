@@ -114,121 +114,125 @@ const page = () => {
   );
 
   return (
-    <div className="bg-[#1a1a1a] min-h-screen py-10">
-      <h1 className="text-gray-300 font-bold text-center text-xl">
-        Your Brand Ambassador Profile
-      </h1>
+    <div className="bg-[#1a1a1a] min-h-screen py-7 pl-64 lg:pl-64">
+      <div className="max-w-7xl mx-auto px-4">
+        <h1 className="text-gray-300 font-bold text-center text-xl">
+          Your Brand Ambassador Profile
+        </h1>
 
-      <form onSubmit={handleSubmit} className="pt-4 max-w-[700px] m-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          delay={0.3}
-          className="flex items-center justify-center gap-4 py-4 w-full"
-        >
-          <img className="w-[150px] h-[150px] rounded-full" src={formData['img-upload']}/>
-          <div className="flex flex-col gap-2 justify-start">
-            <label
-              style={{ cursor: "pointer" }}
-              htmlFor="img-upload"
-              className="text-gray-300 bg-red-600 p-1 rounded-sm text-sm underline"
-            >
-              Choose Image
-            </label>
-            <input
-              id="img-upload"
-              style={{
-                display: "none",
-              }}
-              accept="image/jpeg, image/png, image/webp"
-              type="file"
-              className=""
-              onChange={e => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = () => {
-                  setFormData({...formData, 'img-upload': reader.result});
-                };
-                reader.readAsDataURL(file);
-
-              }}
-            />
-            <button className="text-gray-300 w-max underline text-sm" onClick={() => setFormData({...formData, 'img-upload': '/default-profile-pic.jpg'})}>
-              Remove Image
-            </button>
-          </div>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-          <InputField
-            label="Name"
-            id="name"
-            placeholder="Enter your full name"
-            delay={0.4}
-          />
-          <InputField
-            label="Contact"
-            id="contact"
-            placeholder="+92XXXXXXXXXX"
-            delay={0.4}
-          />
-          <InputField
-            label="Email"
-            id="email"
-            type="email"
-            placeholder="your@email.com"
-            delay={0.5}
-          />
-          <InputField
-            label="CNIC"
-            id="cnic"
-            placeholder="XXXXX-XXXXXXX-X"
-            delay={0.5}
-          />
-          <InputField
-            label="Institution"
-            id="institution"
-            placeholder="Your institution name"
-            delay={0.6}
-          />
-          <InputField
-            label="Password"
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            delay={0.6}
-          />
-
+        <form onSubmit={handleSubmit} className="pt-4 max-w-[700px] m-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="mt-5 md:col-span-2 flex flex-col gap-4"
+            delay={0.3}
+            className="flex items-center justify-center gap-4 py-4 w-full"
           >
-            <button
-              className="py-2 px-20 bg-[#2a2a2a] text-gray-300 rounded-lg w-full 
-                  hover:from-red-600 hover:to-red-500 transition-all duration-200 transform hover:scale-[1.02]
-                  disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-              type="button"
-              disabled={loading}
-              onClick={() => router.back()}
-            >
-              Discard Changes
-            </button>
-
-            <button
-              className="py-2 px-20 bg-gradient-to-r from-red-700 to-red-600 text-white rounded-lg w-full 
-                  hover:from-red-600 hover:to-red-500 transition-all duration-200 transform hover:scale-[1.02]
-                  disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-              type="submit"
-              disabled={loading}
-            >
-              Save Profile
-            </button>
+            <img className="w-[150px] h-[150px] rounded-full" src={formData['img-upload']}/>
+            <div className="flex flex-col gap-2 justify-start">
+              <label
+                style={{ cursor: "pointer" }}
+                htmlFor="img-upload"
+                className="text-gray-300 bg-red-600 p-1 rounded-sm text-sm underline"
+              >
+                Choose Image
+              </label>
+              <input
+                id="img-upload"
+                style={{
+                  display: "none",
+                }}
+                accept="image/jpeg, image/png, image/webp"
+                type="file"
+                onChange={e => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    setFormData({...formData, 'img-upload': reader.result});
+                  };
+                  reader.readAsDataURL(file);
+                }}
+              />
+              <button 
+                type="button"
+                className="text-gray-300 w-max underline text-sm" 
+                onClick={() => setFormData({...formData, 'img-upload': '/default-profile-pic.jpg'})}
+              >
+                Remove Image
+              </button>
+            </div>
           </motion.div>
-        </div>
-      </form>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+            <InputField
+              label="Name"
+              id="name"
+              placeholder="Enter your full name"
+              delay={0.4}
+            />
+            <InputField
+              label="Contact"
+              id="contact"
+              placeholder="+92XXXXXXXXXX"
+              delay={0.4}
+            />
+            <InputField
+              label="Email"
+              id="email"
+              type="email"
+              placeholder="your@email.com"
+              delay={0.5}
+            />
+            <InputField
+              label="CNIC"
+              id="cnic"
+              placeholder="XXXXX-XXXXXXX-X"
+              delay={0.5}
+            />
+            <InputField
+              label="Institution"
+              id="institution"
+              placeholder="Your institution name"
+              delay={0.6}
+            />
+            <InputField
+              label="Password"
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              delay={0.6}
+            />
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="mt-5 md:col-span-2 flex flex-col gap-4"
+            >
+              <button
+                className="py-2 px-20 bg-[#2a2a2a] text-gray-300 rounded-lg w-full 
+                    hover:from-red-600 hover:to-red-500 transition-all duration-200 transform hover:scale-[1.02]
+                    disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                type="button"
+                disabled={loading}
+                onClick={() => router.back()}
+              >
+                Discard Changes
+              </button>
+
+              <button
+                className="py-2 px-20 bg-gradient-to-r from-red-700 to-red-600 text-white rounded-lg w-full 
+                    hover:from-red-600 hover:to-red-500 transition-all duration-200 transform hover:scale-[1.02]
+                    disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                type="submit"
+                disabled={loading}
+              >
+                Save Profile
+              </button>
+            </motion.div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
