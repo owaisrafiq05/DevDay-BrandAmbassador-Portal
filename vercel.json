@@ -1,7 +1,12 @@
 {
     "redirects": [
       {
-        "source": "(?!/signup$)(.*)",
+        "source": "^/$",
+        "destination": "https://ba.devday25.com/signup",
+        "permanent": true
+      },
+      {
+        "source": "^/login$",
         "destination": "https://ba.devday25.com/signup",
         "permanent": true
       }
