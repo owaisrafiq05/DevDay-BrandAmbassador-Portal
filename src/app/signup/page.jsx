@@ -118,7 +118,7 @@ const Signup = () => {
       submitData.append('ProfilePhoto', formData.profileImage);
 
       const response = await axios.post(
-        'http://localhost:4000/BrandAmbassador/signup',
+        'https://dev-day-backend.vercel.app/BrandAmbassador/signup',
         submitData,
         {
           headers: {
