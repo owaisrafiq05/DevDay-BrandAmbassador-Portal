@@ -315,7 +315,7 @@ const Signup = () => {
               className="w-full py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg 
                        transition-colors duration-200 font-medium mt-6"
             >
-              {loading ? "Signing up..." : "Sign Up"}
+              {loading ? "Submitting..." : "Submit"}
             </button>
 
 {/*             <p className="text-center text-gray-400 text-sm">
