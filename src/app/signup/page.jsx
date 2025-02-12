@@ -37,10 +37,14 @@ const Signup = () => {
   };
 
   const formatCnic = (value) => {
-    // Remove all non-digit characters
     const digits = value.replace(/\D/g, "");
-    // Format as XXXXX-XXXXXXX-X
-    return digits.replace(/(\d{5})(\d{7})(\d{1})?/, "$1-$2-$3").trim();
+    if (digits.length <= 5) {
+      return digits; // Return as is if 5 or fewer digits
+    } else if (digits.length <= 12) {
+      return `${digits.slice(0, 5)}-${digits.slice(5)}`; // Add first hyphen
+    } else {
+      return `${digits.slice(0, 5)}-${digits.slice(5, 12)}-${digits.slice(12, 13)}`; // Add both hyphens
+    }
   };
 
   const handleImageUpload = (e) => {
@@ -251,6 +255,7 @@ const Signup = () => {
                   type="text"
                   id="contact"
                   value={formData.contact}
+                  placeholder="03XXXXXXXXX"
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white 
                            focus:outline-none focus:border-red-500 transition-colors"
