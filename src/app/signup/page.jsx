@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { toast, Toaster } from "sonner";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { FaImage } from "react-icons/fa6";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Signup = () => {
   const router = useRouter();
@@ -23,6 +24,7 @@ const Signup = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [captchaValue, setCaptchaValue] = useState(null);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -123,7 +125,7 @@ const Signup = () => {
     e.preventDefault();
     setLoading(true);
 
-    if (!validateForm()) {
+    if (!validateForm() || !captchaValue) {
       setLoading(false);
       return;
     }
@@ -323,6 +325,14 @@ const Signup = () => {
                   required
                 />
               </div>
+            </div>
+
+            {/* Add ReCAPTCHA component */}
+            <div className="flex justify-center mb-6">
+              <ReCAPTCHA
+                sitekey="6LfXHtUqAAAAACsOLXUOV1kjNiIue2zsxmt4UGJ_" // Replace with your site key
+                onChange={(value) => setCaptchaValue(value)} // Set captcha value
+              />
             </div>
 
             <button
