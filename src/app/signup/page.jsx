@@ -189,7 +189,11 @@ const Signup = () => {
           transition={{ duration: 0.5 }}
           className="w-full max-w-[500px] p-8 bg-[#242424] rounded-lg shadow-2xl"
         >
-          <h2 className="text-2xl font-bold text-white mb-6">Brand Ambassador Application</h2>
+          <div className="mobile-logo block lg:hidden mb-4">
+            <img src="https://i.ibb.co/Q3wC3cqz/DD-25-Logo-With-Outline-Full-V7.png" alt="Website Logo" />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-6 text-center">Brand Ambassador Application</h2>
+          
           
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Profile Image Upload */}
@@ -301,14 +305,14 @@ const Signup = () => {
 
               <div>
                 <label className="text-sm text-gray-300 mb-1.5 block">
-                  Social Media Handle
+                  Social Media Link
                 </label>
                 <input
                   type="text"
                   id="socialHandle"
                   value={formData.socialHandle}
                   onChange={handleChange}
-                  placeholder="@username"
+                  placeholder="Instagram Preferred"
                   className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white 
                            focus:outline-none focus:border-red-500 transition-colors"
                   required
