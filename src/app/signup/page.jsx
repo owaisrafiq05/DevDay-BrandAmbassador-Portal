@@ -69,6 +69,13 @@ const Signup = () => {
   };
 
   const validateForm = () => {
+    // Name validation (only letters and spaces)
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    if (!nameRegex.test(formData.name)) {
+      toast.error("Name can only contain letters and spaces.");
+      return false;
+    }
+    
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
