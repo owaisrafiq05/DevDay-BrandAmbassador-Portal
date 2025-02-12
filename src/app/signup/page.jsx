@@ -334,6 +334,7 @@ const Signup = () => {
               <ReCAPTCHA
                 sitekey="6LdUIdUqAAAAAM84Ki3WS2ARudCLK4Bf2QnI1qWi" // Ensure this is your valid site key
                 onChange={(value) => setCaptchaValue(value)} // Set captcha value
+                theme="dark"
               />
             </div>
 
