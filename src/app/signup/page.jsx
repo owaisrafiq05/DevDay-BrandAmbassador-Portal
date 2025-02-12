@@ -125,7 +125,9 @@ const Signup = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Check if ReCAPTCHA is completed
     if (!validateForm() || !captchaValue) {
+      toast.error("Please complete the ReCAPTCHA");
       setLoading(false);
       return;
     }
@@ -330,7 +332,7 @@ const Signup = () => {
             {/* Add ReCAPTCHA component */}
             <div className="flex justify-center mb-6">
               <ReCAPTCHA
-                sitekey="6LfXHtUqAAAAACsOLXUOV1kjNiIue2zsxmt4UGJ_" // Replace with your site key
+                sitekey="6LdUIdUqAAAAAM84Ki3WS2ARudCLK4Bf2QnI1qWi" // Ensure this is your valid site key
                 onChange={(value) => setCaptchaValue(value)} // Set captcha value
               />
             </div>
