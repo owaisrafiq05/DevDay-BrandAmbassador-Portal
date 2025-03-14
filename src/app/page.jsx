@@ -1,20 +1,96 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaQrcode, FaLink, FaTwitter, FaFacebook, FaWhatsapp, FaLinkedin, FaCopy } from "react-icons/fa6";
 import QRCode from "react-qr-code";
 import { Toaster, toast } from 'sonner';
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
+  const router = useRouter();
   const [showQR, setShowQR] = useState(false);
-  const referralLink = "www.devday25.com/register?baid=1234";
+  const [userDetails, setUserDetails] = useState(null);
+  const [referralStats, setReferralStats] = useState({ count: 0, rank: 0, teams: [], approvedPaymentCount: 0 });
+  const [loading, setLoading] = useState(true);
+  
+  // Generate referral link with user's code
+  const referralLink = userDetails ? `www.devday25.com/register?baid=${userDetails.Code}` : "www.devday25.com/register";
   
   const stats = [
-    { label: "Total Referrals", value: "23" },
-    { label: "Points Earned", value: "5,000" },
-    { label: "Current Rank", value: "#4" },
-    { label: "Successful Conversions", value: "18" },
+    { label: "Total Referrals", value: referralStats.count.toString() },
+    { label: "Current Rank", value: `#${referralStats.rank}` },
+    { label: "Approved Referrals", value: `#${referralStats.approvedPaymentCount}` },
   ];
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const userId = Cookies.get('userId');
+        const token = Cookies.get('token');
+        
+        if (!userId || !token) {
+          toast.error("You need to login first");
+          router.push('/login');
+          return;
+        }
+        
+        const response = await fetch(`https://dev-day-backend.vercel.app/BrandAmbassador/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          setUserDetails(data.ambassador);
+          // Fetch referral stats after getting user details
+          fetchReferralStats(data.ambassador.Code, token);
+          toast.success("User details loaded successfully");
+        } else {
+          toast.error(data.message || "Failed to load user details");
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+        toast.error("An error occurred while fetching user details");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUserDetails();
+  }, [router]);
+
+  const fetchReferralStats = async (baCode, token) => {
+    try {
+      const response = await fetch(`https://dev-day-backend.vercel.app/BrandAmbassador/GetAllBARegistration?code=${baCode}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setReferralStats({
+          count: data.count,
+          rank: data.rank,
+          teams: data.teams,
+          approvedPaymentCount: data.approvedPaymentCount,
+        });
+      } else {
+        toast.error(data.message || "Failed to load referral stats");
+      }
+    } catch (error) {
+      console.error("Error fetching referral stats:", error);
+      toast.error("An error occurred while fetching referral stats");
+    }
+  };
 
   const shareOptions = [
     { 
@@ -48,6 +124,14 @@ const Dashboard = () => {
     toast.success("Link copied to clipboard!");
   };
 
+  if (loading) {
+    return (
+      <div className="bg-[#1a1a1a] min-h-screen flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[#1a1a1a] min-h-screen py-7 pl-0 lg:pl-64">
       <Toaster/>
@@ -59,7 +143,7 @@ const Dashboard = () => {
           className="bg-gradient-to-br from-[#242424] to-[#1a1a1a] p-6 rounded-2xl border border-red-500/10 shadow-lg mb-8"
         >
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-            Welcome back, <span className="text-red-500">John Doe</span>! 👋
+            Welcome back, <span className="text-red-500">{userDetails?.Name || "Brand Ambassador"}</span>! 👋
           </h1>
           <p className="text-gray-400 text-sm sm:text-base">
             Thank you for being a valuable Brand Ambassador for DevDay'25. Share your unique referral link with potential participants and earn exciting rewards!
@@ -71,7 +155,7 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
         >
           {stats.map((stat, index) => (
             <div 
@@ -147,27 +231,52 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* Recent Activity */}
+        {/* Teams Table */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="bg-[#242424] p-6 rounded-2xl border border-red-500/10 shadow-lg"
+          className="bg-[#242424] p-6 rounded-2xl border border-red-500/10 shadow-lg overflow-x-auto"
         >
-          <h2 className="text-xl font-bold text-white mb-4">Recent Activity</h2>
-          <div className="space-y-4">
-            {[1, 2, 3].map((_, index) => (
-              <div 
-                key={index}
-                className="flex items-center gap-4 p-3 bg-[#2a2a2a] rounded-lg border border-red-500/5"
-              >
-                <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                <div>
-                  <p className="text-white text-sm">New referral signup</p>
-                  <p className="text-gray-400 text-xs">2 hours ago</p>
-                </div>
-              </div>
-            ))}
+          <h2 className="text-xl font-bold text-white mb-4">Team Registrations</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-red-500/10">
+                  <th className="text-left py-3 px-4 text-gray-400 text-sm font-medium">Competition</th>
+                  <th className="text-left py-3 px-4 text-gray-400 text-sm font-medium">Team Name</th>
+                  <th className="text-left py-3 px-4 text-gray-400 text-sm font-medium">Leader Name</th>
+                  <th className="text-left py-3 px-4 text-gray-400 text-sm font-medium">Institute</th>
+                  <th className="text-left py-3 px-4 text-gray-400 text-sm font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {referralStats.teams.map((team) => (
+                  <tr key={team.id} className="border-b border-red-500/5 hover:bg-[#2a2a2a] transition-colors">
+                    <td className="py-3 px-4 text-white text-sm">{team.Competition_Name}</td>
+                    <td className="py-3 px-4 text-white text-sm">{team.Team_Name}</td>
+                    <td className="py-3 px-4 text-white text-sm">{team.L_Name}</td>
+                    <td className="py-3 px-4 text-white text-sm">{team.Institute_Name}</td>
+                    <td className="py-3 px-4">
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        team.Payment_Verification_Status 
+                          ? "bg-green-500/20 text-green-400" 
+                          : "bg-yellow-500/20 text-yellow-400"
+                      }`}>
+                        {team.Payment_Verification_Status ? "Verified" : "Pending"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {referralStats.teams.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="py-4 text-center text-gray-400">
+                      No team registrations found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </motion.div>
       </div>

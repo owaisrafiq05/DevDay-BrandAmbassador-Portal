@@ -4,6 +4,8 @@ import { FaTrophy } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
+import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false); // Default to closed
@@ -60,6 +62,14 @@ const Sidebar = () => {
   };
 
   const handleLogout = () => {
+    // Remove token and userId from cookies
+    Cookies.remove('token');
+    Cookies.remove('userId');
+    
+    // Show success message
+    toast.success('Logged out successfully');
+    
+    // Redirect to login page
     router.push('/login');
   };
 

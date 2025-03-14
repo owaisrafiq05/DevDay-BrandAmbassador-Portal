@@ -1,57 +1,76 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaAward, FaTrophy } from "react-icons/fa6";
 import { motion } from "framer-motion";
-// import './index.css'
+import { Toaster, toast } from 'sonner';
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
-const page = () => {
-  const [rankings, setRankings] = useState([
-    {
-      ranking: 1,
-      img: "/default-profile-pic.jpg",
-      name: "John Doe Son",
-      points: 5000,
-      referrals: 10,
-    },
-    {
-      ranking: 2,
-      img: "/default-profile-pic.jpg",
-      name: "John Doe",
-      points: 5000,
-      referrals: 10,
-    },
-    {
-      ranking: 3,
-      img: "/default-profile-pic.jpg",
-      name: "John Doe",
-      points: 5000,
-      referrals: 10,
-    },
-    {
-      ranking: 4,
-      img: "/default-profile-pic.jpg",
-      name: "John Doe Son Of John Doe Kevin",
-      points: 5000,
-      referrals: 10,
-    },
-    {
-      ranking: 5,
-      img: "/default-profile-pic.jpg",
-      name: "John Doe",
-      points: 5000,
-      referrals: 10,
-    },
-    {
-      ranking: 6,
-      img: "/default-profile-pic.jpg",
-      name: "John Doe",
-      points: 5000,
-      referrals: 10,
-    },
-  ]);
+const LeaderboardPage = () => {
+  const router = useRouter();
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const defaultProfilePic = "/default-profile-pic.jpg";
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const token = Cookies.get('token');
+        
+        if (!token) {
+          toast.error("You need to login first");
+          router.push('/login');
+          return;
+        }
+        
+        const response = await fetch('https://dev-day-backend.vercel.app/BrandAmbassador/Leaderboard', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          setLeaderboard(data.leaderboard);
+          toast.success("Leaderboard loaded successfully");
+        } else {
+          toast.error(data.message || "Failed to load leaderboard");
+        }
+      } catch (error) {
+        console.error("Error fetching leaderboard:", error);
+        toast.error("An error occurred while fetching leaderboard");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchLeaderboard();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="bg-[#1a1a1a] min-h-screen flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  // Get top 3 ambassadors
+  const topThree = leaderboard.slice(0, 3);
+  // Fill with empty objects if less than 3
+  while (topThree.length < 3) {
+    topThree.push({ name: "-", referralCount: "-" });
+  }
+
+  // Get ambassadors ranked 4 and below
+  const restOfLeaderboard = leaderboard.slice(3);
 
   return (
     <div className="bg-[#1a1a1a] min-h-screen py-7 pl-0 lg:pl-64">
+      <Toaster />
       <div className="max-w-7xl mx-auto px-4">
         <h1 className="text-white text-2xl font-extrabold text-center mb-10">
           Brand Ambassador Leaderboard
@@ -67,14 +86,14 @@ const page = () => {
           >
             <img src="/3rd-place.png" className="w-[50px] sm:w-[75px] drop-shadow-2xl" alt="" />
             <img
-              className="w-[50px] h-[50px] sm:w-[125px] sm:h-[125px] rounded-full sm:rounded-[20px] border-2 border-emerald-500 shadow-lg"
-              src="/default-profile-pic.jpg"
+              className="w-[50px] h-[50px] sm:w-[125px] sm:h-[125px] rounded-full sm:rounded-[20px] border-2 border-emerald-500 shadow-lg object-cover"
+              src={topThree[2]?.profilePhoto || defaultProfilePic}
               alt=""
             />
-            <h1 className="text-center text-xs sm:text-base">{rankings.length >= 3 ? rankings[2].name : "-"}</h1>
+            <h1 className="text-center text-xs sm:text-base truncate max-w-[100px] sm:max-w-[180px]">{topThree[2]?.name || "-"}</h1>
             <div className="bg-[#2a2a2a] px-3 py-2 rounded-md text-emerald-500 flex gap-2 justify-center items-center text-xs sm:text-base border border-emerald-500/20">
               <FaAward className="w-4 h-4" />{" "}
-              <h1>{rankings.length >= 3 ? rankings[2].points : "-"}</h1>
+              <h1>{topThree[2]?.referralCount || "-"}</h1>
             </div>
           </motion.div>
 
@@ -86,14 +105,14 @@ const page = () => {
           >
             <img src="/1st-place.png" className="w-[50px] sm:w-[75px] drop-shadow-2xl" alt="" />
             <img
-              className="w-[50px] h-[50px] sm:w-[125px] sm:h-[125px] rounded-full sm:rounded-[20px] border-2 border-red-500 shadow-lg"
-              src="/default-profile-pic.jpg"
+              className="w-[50px] h-[50px] sm:w-[125px] sm:h-[125px] rounded-full sm:rounded-[20px] border-2 border-red-500 shadow-lg object-cover"
+              src={topThree[0]?.profilePhoto || defaultProfilePic}
               alt=""
             />
-            <h1 className="text-center text-xs sm:text-base">{rankings.length >= 1 ? rankings[0].name : "-"}</h1>
+            <h1 className="text-center text-xs sm:text-base truncate max-w-[100px] sm:max-w-[180px]">{topThree[0]?.name || "-"}</h1>
             <div className="bg-[#2a2a2a] px-3 py-2 rounded-md text-red-500 flex gap-2 justify-center items-center text-xs sm:text-base border border-red-500/20">
               <FaAward className="w-4 h-4" />{" "}
-              <h1>{rankings.length >= 1 ? rankings[0].points : "-"}</h1>
+              <h1>{topThree[0]?.referralCount || "-"}</h1>
             </div>
           </motion.div>
 
@@ -105,20 +124,20 @@ const page = () => {
           >
             <img src="/2nd-place.png" className="w-[50px] sm:w-[75px] drop-shadow-2xl" alt="" />
             <img
-              className="w-[50px] h-[50px] sm:w-[125px] sm:h-[125px] rounded-full sm:rounded-[20px] border-2 border-blue-500 shadow-lg"
-              src="/default-profile-pic.jpg"
+              className="w-[50px] h-[50px] sm:w-[125px] sm:h-[125px] rounded-full sm:rounded-[20px] border-2 border-blue-500 shadow-lg object-cover"
+              src={topThree[1]?.profilePhoto || defaultProfilePic}
               alt=""
             />
-            <h1 className="text-center text-xs sm:text-base">{rankings.length >= 2 ? rankings[1].name : "-"}</h1>
+            <h1 className="text-center text-xs sm:text-base truncate max-w-[100px] sm:max-w-[180px]">{topThree[1]?.name || "-"}</h1>
             <div className="bg-[#2a2a2a] px-3 py-2 rounded-md text-blue-500 flex gap-2 justify-center items-center text-xs sm:text-base border border-blue-500/20">
               <FaAward className="w-4 h-4" />{" "}
-              <h1>{rankings.length >= 2 ? rankings[1].points : "-"}</h1>
+              <h1>{topThree[1]?.referralCount || "-"}</h1>
             </div>
           </motion.div>
         </div>
 
         {/* other rankings */}
-        {rankings.length > 3 && (
+        {restOfLeaderboard.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -130,38 +149,38 @@ const page = () => {
                 <tr>
                   <th className="py-4 px-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-400">Rank</th>
                   <th className="py-4 px-2 sm:px-4 text-left text-xs sm:text-sm font-medium text-gray-400">Ambassador</th>
-                  <th className="py-4 px-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-400">Points</th>
                   <th className="py-4 px-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-400">Referrals</th>
+                  {/* <th className="py-4 px-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-400">Code</th> */}
                 </tr>
               </thead>
               <tbody>
-                {rankings.slice(3).map((player, index) => (
+                {restOfLeaderboard.map((ambassador, index) => (
                   <tr key={index} className="border-b border-red-500/5 hover:bg-red-500/5 transition-colors duration-200">
                     <td className="py-4 px-2 sm:px-4">
                       <div className="flex items-center justify-center w-full h-full gap-1 text-xs sm:text-sm text-red-500">
-                        <FaTrophy className="w-4 h-4" /> <span>{player.ranking}</span>
+                        <FaTrophy className="w-4 h-4" /> <span>{ambassador.rank}</span>
                       </div>
                     </td>
                     <td className="py-4 px-2 sm:px-4">
                       <div className="flex gap-3 items-center">
                         <img
-                          src={player.img}
-                          className="rounded-full w-[35px] h-[35px] border border-red-500/20"
+                          src={ambassador.profilePhoto || defaultProfilePic}
+                          className="rounded-full w-[35px] h-[35px] border border-red-500/20 object-cover"
                           alt=""
                         />
                         <span className="text-xs sm:text-sm text-gray-300 font-medium truncate max-w-[100px] sm:max-w-[200px]">
-                          {player.name}
+                          {ambassador.name}
                         </span>
                       </div>
                     </td>
                     <td className="py-4 px-2 sm:px-4">
                       <div className="flex gap-2 justify-center items-center w-full h-full text-xs sm:text-sm text-red-500">
-                        <span>{player.points}</span> <FaAward className="w-4 h-4" />
+                        <span>{ambassador.referralCount}</span> <FaAward className="w-4 h-4" />
                       </div>
                     </td>
-                    <td className="py-4 px-2 sm:px-4 text-center text-xs sm:text-sm text-gray-300">
-                      {player.referrals}
-                    </td>
+                    {/* <td className="py-4 px-2 sm:px-4 text-center text-xs sm:text-sm text-gray-300">
+                      {ambassador.code}
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -173,4 +192,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default LeaderboardPage;

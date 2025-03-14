@@ -2,14 +2,17 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 const Login = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    Email: "",
+    Password: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -33,7 +36,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('https://dev-day-backend.vercel.app/BrandAmbassador/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,8 +46,17 @@ const Login = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (data.success) {
+        // Save token and userId in cookies
+        Cookies.set('token', data.token, { expires: 7 }); // Expires in 7 days
+        Cookies.set('userId', data.user.id, { expires: 7 });
+        
         toast.success('Login successful!');
+        
+        // Redirect to dashboard or home page after successful login
+        setTimeout(() => {
+          router.push('/');
+        }, 1000);
       } else {
         toast.error(data.message || 'Login failed');
       }
@@ -57,7 +69,7 @@ const Login = () => {
   };
 
   const validateForm = () => {
-    if (!formData.email || !formData.password) {
+    if (!formData.Email || !formData.Password) {
       toast.error("Please fill in both email and password.");
       return false;
     }
@@ -66,6 +78,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex">
+      <Toaster/>
       {/* Left side - Branding */}
       <div className="w-full lg:w-1/2 hidden lg:block relative">
         <div className="absolute inset-0 z-10" />
@@ -96,8 +109,8 @@ const Login = () => {
               </label>
               <input
                 type="email"
-                id="email"
-                value={formData.email}
+                id="Email"
+                value={formData.Email}
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white 
                          focus:outline-none focus:border-red-500 transition-colors"
@@ -111,8 +124,8 @@ const Login = () => {
               </label>
               <input
                 type="password"
-                id="password"
-                value={formData.password}
+                id="Password"
+                value={formData.Password}
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 bg-[#2a2a2a] border border-gray-700 rounded-lg text-white 
                          focus:outline-none focus:border-red-500 transition-colors"
