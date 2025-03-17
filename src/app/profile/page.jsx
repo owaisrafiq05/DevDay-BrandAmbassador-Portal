@@ -201,7 +201,10 @@ const ProfilePage = () => {
   if (loading) {
     return (
       <div className="bg-[#1a1a1a] min-h-screen flex items-center justify-center">
-        <div className="text-white text-xl">Loading profile data...</div>
+        {/* <div className="text-white text-xl">Loading profile data...</div> */}
+        <div className="relative inline-block w-10 h-10">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-red-500"></div>
+        </div>
       </div>
     );
   }
@@ -237,7 +240,7 @@ const ProfilePage = () => {
   );
 
   return (
-    <div className="bg-[#1a1a1a] min-h-screen py-7 pl-0 lg:pl-64">
+    <div className="bg-[#1a1a1a] min-h-screen py-7 pl-0 lg:pl-64 pt-12">
       <Toaster />
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         <MotionDiv 

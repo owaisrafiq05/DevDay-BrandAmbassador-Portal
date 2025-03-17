@@ -75,7 +75,7 @@ const LeaderboardPage = () => {
   const restOfLeaderboard = leaderboard.slice(3);
 
   return (
-    <div className="bg-[#1a1a1a] min-h-screen py-7 pl-0 lg:pl-64">
+    <div className="bg-[#1a1a1a] min-h-screen py-7 pl-0 lg:pl-64 pt-12">
       <Toaster />
       <div className="max-w-7xl mx-auto px-4">
         <h1 className="text-white text-2xl font-extrabold text-center mb-10">
