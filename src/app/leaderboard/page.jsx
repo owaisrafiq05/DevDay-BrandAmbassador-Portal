@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Toaster, toast } from "sonner";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import './index.css'
 
 const LeaderboardPage = () => {
   const router = useRouter();
@@ -100,7 +101,7 @@ const LeaderboardPage = () => {
               src={topThree[2]?.profilePhoto || defaultProfilePic}
               alt=""
             />
-            <h1 className="text-center text-xs sm:text-base truncate max-w-[100px] sm:max-w-[180px]">
+            <h1 className="rank-div-name text-center text-xs sm:text-base truncate max-w-[100px] sm:max-w-[180px]">
               {topThree[2]?.name || "-"}
             </h1>
             <div className="bg-[#2a2a2a] px-3 py-2 rounded-md text-emerald-500 flex gap-2 justify-center items-center text-xs sm:text-base border border-emerald-500/20">
@@ -125,7 +126,7 @@ const LeaderboardPage = () => {
               src={topThree[0]?.profilePhoto || defaultProfilePic}
               alt=""
             />
-            <h1 className="text-center text-xs sm:text-base truncate max-w-[100px] sm:max-w-[180px]">
+            <h1 className="rank-div-name text-center text-xs sm:text-base truncate max-w-[100px] sm:max-w-[180px]">
               {topThree[0]?.name || "-"}
             </h1>
             <div className="bg-[#2a2a2a] px-3 py-2 rounded-md text-red-500 flex gap-2 justify-center items-center text-xs sm:text-base border border-red-500/20">
@@ -150,7 +151,7 @@ const LeaderboardPage = () => {
               src={topThree[1]?.profilePhoto || defaultProfilePic}
               alt=""
             />
-            <h1 className="text-center text-xs sm:text-base truncate max-w-[100px] sm:max-w-[180px]">
+            <h1 className="rank-div-name text-center text-xs sm:text-base truncate max-w-[100px] sm:max-w-[180px]">
               {topThree[1]?.name || "-"}
             </h1>
             <div className="bg-[#2a2a2a] px-3 py-2 rounded-md text-blue-500 flex gap-2 justify-center items-center text-xs sm:text-base border border-blue-500/20">
