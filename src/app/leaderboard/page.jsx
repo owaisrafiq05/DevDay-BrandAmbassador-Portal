@@ -57,8 +57,8 @@ const LeaderboardPage = () => {
     return (
       <div className="bg-[#1a1a1a] min-h-screen flex items-center justify-center">
         {/* <div className="text-white text-xl">Loading...</div> */}
-        <div class="relative inline-block w-10 h-10">
-          <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-red-500"></div>
+        <div className="relative inline-block w-10 h-10">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-red-500"></div>
         </div>
       </div>
     );
